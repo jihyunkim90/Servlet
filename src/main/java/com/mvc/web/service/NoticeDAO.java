@@ -39,39 +39,77 @@ public class NoticeDAO {
 		int count=0;
 		int start = 1 + (page - 1) * 10;
 		int end = page * 10;
+		
+		
+		
+		String sql1= "select * ,  (select count(id) as count "
+				+ "				     from tbl_board "
+				+ "				       	where (LEVENSHTEIN(writer_id, ?)<=2)"
+				+ "                          and useFlag ='Y' "
+				+ "				           	  and boardid in (select boardID "
+				+ "				         				    from user_auth "
+				+ "				            			       where rankcd= ?)) as count "
+				+ "					  from (select @rownum:=@rownum+1 as num ,n.* "
+				+ "						          from( select * "
+				+ "					                 from tbl_board "
+				+ "										    where (LEVENSHTEIN(writer_id, ?)<=2) "
+				+ "											and useFlag ='Y' "
+				+ "					                   and boardid in (select boardID "
+				+ "										    from user_auth "
+				+ "											   where rankcd=? ) "
+				+ "						      			order by regdate desc)n, "
+				+ "								  (SELECT @rownum:=0)low) num "
+				+ "							  where num.num between ? and ?";
 
-		String sql = "select * , ( select count(id) "
-				+ "			                from tbl_board "
-				+ "			                  where " + field + " like ? "
-				+ "				                     and useFlag = 'Y' "
-				+ "                                     and boardid in(select boardID "
-				+ "														from user_auth "
-				+ "                                                        where rankcd=?))as count "
-				+ " from (select @rownum:=@rownum+1 as num ,n.* "
-				+ "				            from( select * "
-				+ "					                from tbl_board "
-				+ "			                  where " + field + " like ? "
-				+ "				                     and useFlag = 'Y' "
-				+ "                                     and boardid in(select boardID "
-				+ "														from user_auth "
-				+ "                                                        where rankcd=?) "
-				+ "					        order by regdate desc)n "
-				+ "				             where (@rownum:=0)=0)num "
-				+ "				    where num.num between ? and ?  "; // 조회 sql
+		String sql2 = "	select * ,  (select count(id) as count "
+				+ "			  			              from tbl_board "
+				+ "				    	           	where "+field+" like ? "
+				+ "						           	  and useFlag ='Y' "
+				+ "						           	  and boardid in (select boardID "
+				+ "						             				    from user_auth "
+				+ "						             			       where rankcd= ?)) as count "
+				+ "					  from (select @rownum:=@rownum+1 as num ,n.* "
+				+ "					          from( select * "
+				+ "						                 from tbl_board "
+				+ "									    where "+field+" like ? "
+				+ "										  and useFlag ='Y' "
+				+ "					                   and boardid in (select boardID "
+				+ "														    from user_auth "
+				+ "														   where rankcd=? ) "
+				+ "						      			order by regdate desc)n, "
+				+ "							  (SELECT @rownum:=0)low) num "
+				+ "					  where num.num between ? and ? "; // 조회 sql
 		List<notice> list=new ArrayList<>();
 
+		
+		
+		
 		try {
-
+			//검색 조건이 title 일때
 			con = ConnectionProvider.getConnection();
-			psmt = con.prepareStatement(sql);
-			psmt.setString(1, "%" + qurry + "%");
-			psmt.setString(2, rank);
-			psmt.setString(3, "%" + qurry + "%");
-			psmt.setString(4, rank);
-			psmt.setInt(5, start);
-			psmt.setInt(6, end);
-			System.out.println(psmt);
+			
+			if(field.equals("title")) {
+				psmt = con.prepareStatement(sql2);
+				psmt.setString(1, "%" + qurry + "%");
+				psmt.setString(2, rank);
+				psmt.setString(3, "%" + qurry + "%");
+				psmt.setString(4, rank);
+				psmt.setInt(5, start);
+				psmt.setInt(6, end);
+				System.out.println(psmt);
+			//검색 조건이 writer_id일때
+			}else if(field.equals("writer_id")){
+				psmt = con.prepareStatement(sql1);
+				psmt.setString(1,  qurry);
+				psmt.setString(2, rank);
+				psmt.setString(3,  qurry);
+				psmt.setString(4, rank);
+				psmt.setInt(5, start);
+				psmt.setInt(6, end);
+				System.out.println(psmt);
+			}
 			rs = psmt.executeQuery();
+			
 
 			while (rs.next()) {
 				int id1 = rs.getInt("id");

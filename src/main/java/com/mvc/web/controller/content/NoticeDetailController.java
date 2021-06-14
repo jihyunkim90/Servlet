@@ -17,7 +17,18 @@ import com.mysql.cj.protocol.x.Notice;
 public class NoticeDetailController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+		
+		
+		//세션값 불러오기
+				String userID=req.getSession().getAttribute("userID").toString();
+				String userNm=req.getSession().getAttribute("UserNm").toString();
+				String userRank=req.getSession().getAttribute("userRank").toString();
+				//세션값 테스트
+				System.out.println("content userID" +userID);
+				System.out.println("content userNm" +userNm);
+				System.out.println("content userRank" +userRank);
+				
+				
 		String par = req.getParameter("id");
 		
 		String field_=req.getParameter("f");
@@ -42,7 +53,10 @@ public class NoticeDetailController extends HttpServlet {
 		NoticeDAO.getInstance().upHit(id);
 		
 		notice nt = NoticeDAO.getInstance().getDetail(id);
-
+		
+		req.setAttribute("sid", userID);
+		req.setAttribute("srank", userRank);
+		
 		req.setAttribute("nt", nt);
 		req.setAttribute("f", field);
 		req.setAttribute("q", qurry);

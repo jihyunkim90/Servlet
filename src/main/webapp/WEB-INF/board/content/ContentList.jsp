@@ -41,7 +41,8 @@
 							<tr>
 								<th>ID</th>
 								<th>Title</th>
-								<th>Name</th>
+								<th>Writer</th>
+								<th>Content</th>
 								<th>DATE</th>
 								<th>HIT</th>
 							</tr>

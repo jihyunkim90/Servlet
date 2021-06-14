@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+	<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,7 +16,7 @@
 		</tr>
 		<tr>
 			<th>글쓴이</th>
-			<td>${nt.id}</td>
+			<td>${nt.writer_id}</td>
 		</tr>
 		<tr>
 			<th>제목</th>
@@ -38,7 +39,16 @@
 	</table>
 	<div>
 		<input type="button" onclick="location.href='/board/content/list?p=${p}&q=${q}'" value="목록으로">
+		<c:if test="${sessionScope.userID==nt.writer_id}">
 		<input type="button" onclick="location.href='/board/content/modify?id=${nt.id}&q=${q}&f=${f}'" value="수정">
+		</c:if>
+		<c:if test="${sessionScope.userID!=nt.writer_id}">
+		<c:if test="${sessionScope.userRank=='A'}">		
+		<input type="button" onclick="location.href='/board/content/modify?id=${nt.id}&q=${q}&f=${f}'" value="수정">
+			</c:if>
+			<c:if test="${sessionScop.userRank!='A'}">
+			</c:if>
+		</c:if>
 	</div>
 </body>
 </html>
