@@ -25,7 +25,7 @@
 	<!-- header -->
 	<jsp:include page="/WEB-INF/board/etc/header.jsp"></jsp:include>
 	<!-- sidebar -->
-	<c:import url="/board/etc/side"/>
+	<jsp:include page="/WEB-INF/board/etc/sidebar.jsp"></jsp:include>
 	
 	<div class="container-fluid">
 		<div class="row">
@@ -34,7 +34,7 @@
 
 			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 
-				<h2>Section title</h2>
+				<h2>movie list</h2>
 				<div class="table-responsive">
 					<table class="table table-striped table-sm">
 						<thead>

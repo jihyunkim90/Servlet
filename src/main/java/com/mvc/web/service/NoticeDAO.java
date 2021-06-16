@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.jdbc.web.entity.content.EtcList;
+import com.jdbc.web.entity.content.MenuList;
 import com.jdbc.web.entity.content.Picture;
 import com.jdbc.web.entity.content.notice;
 import com.mvc.web.connection.ConnectionProvider;
@@ -37,48 +38,43 @@ public class NoticeDAO {
 		PreparedStatement psmt = null;
 		ResultSet rs = null;
 		int count=0;
-		int start = 1 + (page - 1) * 10;
-		int end = page * 10;
+		int start = (page-1)*10;
 		
 		
 		
-		String sql1= "select * ,  (select count(id) as count "
-				+ "				     from tbl_board "
-				+ "				       	where (LEVENSHTEIN(writer_id, ?)<=2)"
-				+ "                          and useFlag ='Y' "
-				+ "				           	  and boardid in (select boardID "
-				+ "				         				    from user_auth "
-				+ "				            			       where rankcd= ?)) as count "
-				+ "					  from (select @rownum:=@rownum+1 as num ,n.* "
-				+ "						          from( select * "
-				+ "					                 from tbl_board "
-				+ "										    where (LEVENSHTEIN(writer_id, ?)<=2) "
-				+ "											and useFlag ='Y' "
-				+ "					                   and boardid in (select boardID "
-				+ "										    from user_auth "
-				+ "											   where rankcd=? ) "
-				+ "						      			order by regdate desc)n, "
-				+ "								  (SELECT @rownum:=0)low) num "
-				+ "							  where num.num between ? and ?";
+		String sql1= "select low.* , cnt.count"
+				+ "							 from(select * "
+				+ "						from tbl_board "
+				+ "				                     where (LEVENSHTEIN(writer_id, ?) <= 2)"
+				+ "									   		and useFlag ='Y' "
+				+ "								   		and boardid in (select boardID "
+				+ "																 	  from user_auth "
+				+ "												                	 where rankcd= ?)"
+				+ "									order by regdate desc  limit 10 offset ?)low,"
+				+ "								 (select count(id) as count"
+				+ "									from tbl_board "
+				+ "								   where (LEVENSHTEIN(writer_id, ?) <= 2)"
+				+ "									 and useFlag ='Y' "
+				+ "									and boardid in (select boardID "
+				+ "													   from user_auth "
+				+ "													  where rankcd= ?))cnt";
 
-		String sql2 = "	select * ,  (select count(id) as count "
-				+ "			  			              from tbl_board "
-				+ "				    	           	where "+field+" like ? "
-				+ "						           	  and useFlag ='Y' "
-				+ "						           	  and boardid in (select boardID "
-				+ "						             				    from user_auth "
-				+ "						             			       where rankcd= ?)) as count "
-				+ "					  from (select @rownum:=@rownum+1 as num ,n.* "
-				+ "					          from( select * "
-				+ "						                 from tbl_board "
-				+ "									    where "+field+" like ? "
-				+ "										  and useFlag ='Y' "
-				+ "					                   and boardid in (select boardID "
-				+ "														    from user_auth "
-				+ "														   where rankcd=? ) "
-				+ "						      			order by regdate desc)n, "
-				+ "							  (SELECT @rownum:=0)low) num "
-				+ "					  where num.num between ? and ? "; // 조회 sql
+		String sql2 = "	 select low.* , cnt.count"
+				+ "							 from(select * "
+				+ "									from tbl_board "
+				+ "								   where title like ?"
+				+ "									 and useFlag ='Y' "
+				+ "									 and boardid in (select boardID "
+				+ "												   from user_auth "
+				+ "												  where rankcd=? ) "
+				+ "								order by regdate desc  limit 10 offset ?)low,"
+				+ "							 (select count(id) as count"
+				+ "									from tbl_board "
+				+ "								   where title like ?"
+				+ "									 and useFlag ='Y' "
+				+ "									 and boardid in (select boardID "
+				+ "													   from user_auth "
+				+ "													  where rankcd=? ))cnt; "; // 조회 sql
 		List<notice> list=new ArrayList<>();
 
 		
@@ -92,20 +88,20 @@ public class NoticeDAO {
 				psmt = con.prepareStatement(sql2);
 				psmt.setString(1, "%" + qurry + "%");
 				psmt.setString(2, rank);
-				psmt.setString(3, "%" + qurry + "%");
-				psmt.setString(4, rank);
-				psmt.setInt(5, start);
-				psmt.setInt(6, end);
+				psmt.setString(4, "%" + qurry + "%");
+				psmt.setString(5, rank);
+				psmt.setInt(3, start);
+			
 				System.out.println(psmt);
 			//검색 조건이 writer_id일때
 			}else if(field.equals("writer_id")){
 				psmt = con.prepareStatement(sql1);
 				psmt.setString(1,  qurry);
 				psmt.setString(2, rank);
-				psmt.setString(3,  qurry);
-				psmt.setString(4, rank);
-				psmt.setInt(5, start);
-				psmt.setInt(6, end);
+				psmt.setString(4,  qurry);
+				psmt.setString(5, rank);
+				psmt.setInt(3, start);
+			
 				System.out.println(psmt);
 			}
 			rs = psmt.executeQuery();
@@ -309,6 +305,124 @@ public class NoticeDAO {
 			e.printStackTrace();
 		}
 		return list;
+	}
+
+	public EtcList getAllContent(int page, String qurry, String rank) {
+		Connection con = null;
+		PreparedStatement psmt = null;
+		ResultSet rs = null;
+		int count=0;
+		int start = (page-1)*10;
+		
+		
+		
+		String sql= " select low.* , cnt.count"
+				+ "							from(select * "
+				+ "								from tbl_board "
+				+ "						                     where useFlag ='Y' "
+				+ "                                              and match(title, writer_id,content) against(? in boolean mode)"
+				+ "									   		and boardid in (select boardID "
+				+ "																		 	  from user_auth "
+				+ "														                	 where rankcd= ?)"
+				+ "											order by regdate desc  limit 10 offset ?)low,"
+				+ "										 (select count(id) as count"
+				+ "												from tbl_board "
+				+ "										   where useFlag ='Y' "
+				+ "                                                  and match(title, writer_id,content) against(? in boolean mode)"
+				+ "												and boardid in (select boardID "
+				+ "															from user_auth "
+				+ "															  where rankcd= ?))cnt "; // 조회 sql
+		List<notice> list=new ArrayList<>();
+
+		
+		
+		
+		try {
+			//검색 조건이 title 일때
+			con = ConnectionProvider.getConnection();
+
+				psmt = con.prepareStatement(sql);
+				psmt.setString(1,  qurry);
+				psmt.setString(2, rank);
+				psmt.setString(4, qurry);
+				psmt.setString(5, rank);
+				psmt.setInt(3, start);
+			
+			
+				System.out.println(psmt);
+			
+			rs = psmt.executeQuery();
+			
+
+			while (rs.next()) {
+				int id1 = rs.getInt("id");
+				String title = rs.getString("title");
+				String writeid = rs.getString("writer_id");
+				String content = rs.getString("content");
+				Date regdate = rs.getTimestamp("regdate");
+				int hit = rs.getInt("hit");
+				count =rs.getInt("count");
+
+				// 조회 된 값을 입력하여 초기화하는 생성자 생성
+				notice ns = new notice(id1, title, writeid, content, regdate, hit);
+			
+				// list 에 조회된 값이 저장된 notice 객체 추가
+				list.add(ns);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			jdbcUtil.close(con);
+			jdbcUtil.close(psmt);
+			jdbcUtil.close(rs);
+		}
+		
+		EtcList el=new EtcList(count, list);
+		return el;
+	}
+
+	//rank 에 맞는 메뉴 조회
+	public List<MenuList> getMymenu(String userRank) {
+		Connection con = null;
+		PreparedStatement psmt = null;
+		ResultSet rs = null;
+	
+		String sql= " select board_id, board_name "
+				+ " from board_master "
+				+ " where useFlag ='Y' "
+				+ " and board_id in ( select boardID "
+				+ " 	from user_auth "
+				+ "	  	where rankcd =?) "; // 조회 sql
+		List<MenuList> list =new ArrayList<>();
+
+		try {
+			//검색 조건이 title 일때
+			con = ConnectionProvider.getConnection();
+
+				psmt = con.prepareStatement(sql);
+				psmt.setString(1,  userRank);
+				
+			
+				System.out.println(psmt);
+			
+			rs = psmt.executeQuery();
+			
+
+			while (rs.next()) {
+				int menuid=rs.getInt("board_id");
+				String menu = rs.getString("board_name");
+				
+				MenuList ml=new MenuList(menuid,menu);
+				list.add(ml);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			jdbcUtil.close(con);
+			jdbcUtil.close(psmt);
+			jdbcUtil.close(rs);
+		}
+	return list;
 	}
 
 	

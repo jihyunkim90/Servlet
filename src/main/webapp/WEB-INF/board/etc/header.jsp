@@ -24,8 +24,10 @@
 			aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
-		<input class="form-control form-control-dark w-100" type="text"
-			placeholder="Search" aria-label="Search">
+			<form class="form-control form-control-dark w-100" action="/board/content/allcontent" method="get">	
+		<input class="form-control form-control-dark w-100" type="text" name="q"
+			placeholder="Search" aria-label="Search" aria-label="Search">
+			</form>
 		<ul class="navbar-nav px-3">
 			<li class="nav-item text-nowrap"><a class="nav-link"
 				href="/logout">Sign out</a></li>

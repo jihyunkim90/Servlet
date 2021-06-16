@@ -15,7 +15,7 @@
 
 <!-- Custom styles for this template -->
 <link href="${root}/css/user/form-validation.css" rel="stylesheet">
-
+<!-- root Route -->
 <script type="text/javascript" src="${root}/js/user/Signup.js"></script>
 </head>
 <body>
@@ -38,6 +38,8 @@
 						<form id="joinform" name="joinform" action="" method="post"
 							onsubmit="return createFrom(this)">
 							<div class="row g-3">
+							
+							<!-- ID -->
 								<div class="col-12">
 									<label for="ID" class="form-label">ID</label>
 									<div class="input-group has-validation">
@@ -49,7 +51,7 @@
 									</div>
 								</div>
 
-
+							<!-- password -->
 
 								<div class="col-12">
 									<label for="Password" class="form-label">Password</label> <input
@@ -57,14 +59,14 @@
 										id="password" placeholder="password" required>
 									<div class="invalid-feedback"></div>
 								</div>
-
+							<!-- password check -->
 								<div class="col-12">
 									<label for="passwordCheck" class="form-label">passwordCheck
 										<span class="text-muted"></span>
 									</label> <input type="password" class="form-control" id="passwordCheck"
 										placeholder="Please writer Password again">
 								</div>
-
+							<!-- 이름입력 -->
 								<div class="col-12">
 									<label for="Name" class="form-label">name</label> <input
 										type="text" class="form-control" name="name" id="name"
@@ -72,7 +74,7 @@
 									<div class="invalid-feedback"></div>
 								</div>
 
-
+							<!-- 이메일 입력 -->
 
 								<div class="col-12">
 									<label for="email" class="form-label">Email <span
