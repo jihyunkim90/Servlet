@@ -29,9 +29,6 @@
 	
 	<div class="container-fluid">
 		<div class="row">
-			
-		
-
 			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 
 				<h2>Section title</h2>
@@ -44,6 +41,7 @@
 								<th>Writer</th>
 								<th>Content</th>
 								<th>DATE</th>
+								<th>좋아요</th>
 								<th>HIT</th>
 							</tr>
 						</thead>
@@ -52,19 +50,31 @@
 							<c:forEach var="li" items="${list}">
 								<tr>
 									<td>${li.id}</td>
-									<td><a href="detail?id=${li.id}&q=${param.q}&f=${param.f}">${li.title}</a></td>
+									<td><a href="detail?id=${li.id}&q=${param.q}&f=${param.f}">${li.title}</a>
+									
+									<!-- 댓글 갯수 출력 -->
+									<c:if test="${li.cocnt!=0}">
+										<a href="comment?id=${li.id}"></a>(${li.cocnt})
+									</c:if>
+									<c:if test="${li.cocnt==0}">
+									</c:if></td>
 									<td>${li.writer_id}</td>
 									<td>${li.content }</td>
 									<td><fmt:formatDate pattern="yyyy년 MM월 dd일 hh시 mm분"
 											value="${li.regdate}" /></td>
+									<td>
+									<c:if test="{likecount!=0}">
+										<a href="like?id=${li.writer_id}"></a>[${likecount}]
+									</c:if>
+									<c:if test="{likecount==0}">
+									</c:if>
+									</td>
 									<td>${li.hit}</td>
 								</tr>
 							</c:forEach>
 						</tbody>
 					</table>
-				</div>
-
-				
+				</div>			
 		 <div class="col-12">
       	<div class="row">
       		<div class="col-4">

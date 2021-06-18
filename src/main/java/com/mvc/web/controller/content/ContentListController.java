@@ -63,6 +63,12 @@ public class ContentListController extends HttpServlet {
 		req.setAttribute("list", list);
 		String str =req.getParameter("cnt");
 		
+		int likecount=NoticeDAO.getInstance().getlikeCount(userID, count);
+		
+		req.setAttribute("likecount", likecount);
+		
+		
+		
 		req.getRequestDispatcher("/WEB-INF/board/content/ContentList.jsp").forward(req, resp);
 
 	}

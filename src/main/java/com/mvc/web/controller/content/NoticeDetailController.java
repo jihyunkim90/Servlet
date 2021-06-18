@@ -17,7 +17,8 @@ import com.mysql.cj.protocol.x.Notice;
 public class NoticeDetailController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		
+		 req.setCharacterEncoding("UTF-8");
+		 resp.setContentType("text/html; charset=UTF-8");
 		
 		//세션값 불러오기
 				String userID=req.getSession().getAttribute("userID").toString();
@@ -50,8 +51,15 @@ public class NoticeDetailController extends HttpServlet {
 			qurry =qurry_;
 		}
 		
-		NoticeDAO.getInstance().upHit(id);
+		//좋아요 눌렀는지 확인
+		int likecount =NoticeDAO.getInstance().getlikeCount(userID,id);
 		
+		//좋아요 수 늘리기
+		NoticeDAO.getInstance().uplike(likecount,userID,id);
+		
+		//조회수 늘리기
+		NoticeDAO.getInstance().upHit(id);
+		//디테일 보기
 		notice nt = NoticeDAO.getInstance().getDetail(id);
 		
 		req.setAttribute("sid", userID);
@@ -61,6 +69,8 @@ public class NoticeDetailController extends HttpServlet {
 		req.setAttribute("f", field);
 		req.setAttribute("q", qurry);
 
+		req.setAttribute("lcount", likecount);
+		
 		req.getRequestDispatcher("/WEB-INF/board/content/Detail.jsp").forward(req, resp);
 
 	}

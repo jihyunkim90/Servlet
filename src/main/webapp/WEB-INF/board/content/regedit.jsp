@@ -12,8 +12,8 @@
 <title>Write</title>
  <!-- root Route -->
 <c:set var="root" value="${pageContext.request.contextPath}" />
- <!-- Ck Editor Route -->
-<script type="text/javascript" src="${root}/js/ckeditor/ckeditor.js"></script>
+ <!-- Ck Editor Route 
+<script type="text/javascript" src="${root}/js/ckeditor/ckeditor.js"></script> -->
 
 </head>
 <body>
@@ -26,12 +26,17 @@
 		<div class="row">
 			<div class="col-2"></div>
 			<div class="col-10">
-			<form action="regedit" method="post" >
+			<form action="regedit" method="post" enctype="multipart/form-data">
 	<table border="1">
 		<tbody>
 			<tr>
 				<th>제목</th>
 				<td><input type="text" name="title"></td>
+			</tr>
+			<tr>
+			<tr>
+				<th>파일</th>
+				<td><input type="file" class="form-control" name="file" id="file"></td>
 			</tr>
 			<tr>
 				<th>글내용</th>
@@ -42,8 +47,8 @@
 		</tbody>
 	</table>
 	<input type="submit" value="저장"/>
-	</form>
-	<script type="text/javascript" defer>CKEDITOR.replace('content', {height: 400});</script>
+	</form> 
+<!--  	<script type="text/javascript" defer>CKEDITOR.replace('content', {height: 400});</script> -->
 			</div>	
 		</div>
 	</div>
